@@ -1,0 +1,85 @@
+swagger: "2.0"
+
+info:
+  description: Counts word frequencies and shows recent tweets.
+  title: TweetSneak API
+  version: 1.0.0
+
+produces:
+  - application/json
+
+consumes:
+  - application/json
+
+basePath: /v1
+
+schemes:
+  - http
+
+paths:
+  /search:
+    get:
+      operationId: getSearch
+      summary: Search tweets
+      description: Gets the top 10 most frequently-occurring words from Tweets matching the given keyword, along with the content of the Tweets themselves.
+      parameters:
+        - name: q
+          in: query
+          description: Search keyword
+          type: string
+          required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/SearchResult"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/Error"
+
+definitions:
+  SearchResult:
+    description: Search result
+    type: object
+    properties:
+      frequencies:
+        type: array
+        items:
+          $ref: "#/definitions/WordFrequency"
+      tweets:
+        type: array
+        items:
+          $ref: "#/definitions/Tweet"
+  WordFrequency:
+    description: Word frequency
+    type: object
+    properties:
+        word:
+          type: string
+        count:
+          type: integer
+  Tweet:
+    description: Tweet
+    type: object
+    properties:
+      text:
+        type: string
+      url:
+        type: string
+  Error:
+    description: Error message
+    type: object
+    properties:
+      errorType:
+        type: string
+      errorMessage:
+        type: string
