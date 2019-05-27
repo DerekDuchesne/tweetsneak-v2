@@ -9,6 +9,7 @@ require (
 	github.com/dghubble/go-twitter v0.0.0-20190512073027-53f972dc4b06
 	github.com/dghubble/oauth1 v0.5.0
 	github.com/dghubble/sling v1.2.0 // indirect
+	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-openapi/errors v0.19.0
 	github.com/go-openapi/loads v0.19.0
 	github.com/go-openapi/runtime v0.19.0
@@ -17,7 +18,9 @@ require (
 	github.com/go-openapi/swag v0.19.0
 	github.com/go-openapi/validate v0.19.0
 	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/jessevdk/go-flags v1.4.0
+	github.com/justinas/alice v0.0.0-20171023064455-03f45bd4b7da
 	go.opencensus.io v0.21.0
 	golang.org/x/net v0.0.0-20190514140710-3ec191127204
 	golang.org/x/sync v0.0.0-20190227155943-e225da77a7e6

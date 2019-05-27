@@ -8,9 +8,12 @@ import (
 
 	errors "github.com/go-openapi/errors"
 	runtime "github.com/go-openapi/runtime"
-	middleware "github.com/go-openapi/runtime/middleware"
+	"github.com/justinas/alice"
 
 	"github.com/DerekDuchesne/tweetsneak-v2/api/v1/gen/restapi/operations"
+	"github.com/DerekDuchesne/tweetsneak-v2/api/v1/handlers"
+	"github.com/DerekDuchesne/tweetsneak-v2/logging"
+	"github.com/DerekDuchesne/tweetsneak-v2/tracing"
 )
 
 //go:generate swagger generate server --target ../../gen --name Search --spec ../../swagger/swagger.yml --exclude-main
@@ -33,11 +36,7 @@ func configureAPI(api *operations.SearchAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	if api.GetSearchHandler == nil {
-		api.GetSearchHandler = operations.GetSearchHandlerFunc(func(params operations.GetSearchParams) middleware.Responder {
-			return middleware.NotImplemented("operation .GetSearch has not yet been implemented")
-		})
-	}
+	api.GetSearchHandler = operations.GetSearchHandlerFunc(handlers.Search)
 
 	api.ServerShutdown = func() {}
 
@@ -65,5 +64,5 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	return handler
+	return alice.New(tracing.StackDriverTracingMiddleware, logging.StackDriverLoggingMiddleware).Then(handler)
 }

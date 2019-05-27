@@ -3,16 +3,12 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/go-openapi/loads"
 
 	"github.com/DerekDuchesne/tweetsneak-v2/api/v1/gen/restapi"
 	"github.com/DerekDuchesne/tweetsneak-v2/api/v1/gen/restapi/operations"
-	"github.com/DerekDuchesne/tweetsneak-v2/api/v1/handlers"
-	"github.com/DerekDuchesne/tweetsneak-v2/dependencies/db"
-	"github.com/DerekDuchesne/tweetsneak-v2/dependencies/logging"
-	"github.com/DerekDuchesne/tweetsneak-v2/dependencies/tracing"
-	"github.com/DerekDuchesne/tweetsneak-v2/dependencies/twitter"
 )
 
 func main() {
@@ -24,21 +20,22 @@ func main() {
 
 	// Create the API.
 	api := operations.NewSearchAPI(swaggerSpec)
-	api.GetSearchHandler = handlers.NewGetSearchHandler(
-		logging.NewStackDriverLogger(),
-		tracing.NewStackDriverTracer(),
-		db.NewGCDatastoreClient(),
-		twitter.NewProductionTwitterClient(
-			os.Getenv("TWITTER_CONSUMERKEY"),
-			os.Getenv("TWITTER_CONSUMERSECRET"),
-			os.Getenv("TWITTER_ACCESSTOKEN"),
-			os.Getenv("TWITTER_ACCESSSECRET"),
-		),
-	)
 
 	// Create the server.
 	server := restapi.NewServer(api)
+
+	// Shut down the server once the app terminates.
 	defer server.Shutdown()
+
+	// Configure the API.
+	server.ConfigureAPI()
+
+	// Set the port.
+	port, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		port = 8080
+	}
+	server.Port = port
 
 	// Start the server.
 	if err := server.Serve(); err != nil {
