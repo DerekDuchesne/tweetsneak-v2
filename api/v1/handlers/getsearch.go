@@ -122,6 +122,7 @@ func Search(params operations.GetSearchParams) middleware.Responder {
 	_, span = trace.StartSpan(ctx, "Write search result to database")
 	searchEntity := new(db.SearchResult)
 	searchEntity.Keyword = q
+	searchEntity.Frequencies = make([]db.WordFrequency, 0, len(frequencies))
 	for _, frequency := range frequencies {
 		searchEntity.Frequencies = append(searchEntity.Frequencies, db.WordFrequency{
 			Word:  frequency.word,
@@ -137,16 +138,18 @@ func Search(params operations.GetSearchParams) middleware.Responder {
 
 	// Write the output.
 	searchResult := new(apimodels.SearchResult)
-	for _, tweet := range tweets {
-		searchResult.Tweets = append(searchResult.Tweets, &apimodels.Tweet{
-			Text: tweet.Message,
-			URL:  fmt.Sprintf("https://twitter.com/i/web/status/%d", tweet.ID),
-		})
-	}
+	searchResult.Frequencies = make([]*apimodels.WordFrequency, 0, len(frequencies))
 	for _, frequency := range frequencies {
 		searchResult.Frequencies = append(searchResult.Frequencies, &apimodels.WordFrequency{
 			Word:  frequency.word,
 			Count: int64(frequency.count),
+		})
+	}
+	searchResult.Tweets = make([]*apimodels.Tweet, 0, len(tweets))
+	for _, tweet := range tweets {
+		searchResult.Tweets = append(searchResult.Tweets, &apimodels.Tweet{
+			Text: tweet.Message,
+			URL:  fmt.Sprintf("https://twitter.com/i/web/status/%d", tweet.ID),
 		})
 	}
 

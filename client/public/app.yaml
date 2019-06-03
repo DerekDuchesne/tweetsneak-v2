@@ -1,0 +1,13 @@
+runtime: go111
+service: default
+
+handlers:
+  - url: /css
+    static_dir: css
+  - url: /img
+    static_dir: img
+  - url: /js
+    static_dir: js
+  - url: /.*
+    secure: always
+    script: _go_app

@@ -33,7 +33,7 @@ func main() {
 	// Set the port.
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
-		port = 8080
+		port = 8000
 	}
 	server.Port = port
 
